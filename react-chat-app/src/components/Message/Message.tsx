@@ -12,6 +12,13 @@ interface MessageProps {
 const Message: React.FC<MessageProps> = ({ text, isSender, time, sender, color }) => {
   const initial = sender.charAt(0).toUpperCase();
 
+  const renderContent = () => {
+    if (text.startsWith('<img')) {
+      return <div dangerouslySetInnerHTML={{ __html: text }} />;
+    }
+    return text;
+  };
+
   return (
     <MessageWrapper isSender={isSender}>
       <MessageContainer isSender={isSender}>
@@ -20,9 +27,9 @@ const Message: React.FC<MessageProps> = ({ text, isSender, time, sender, color }
             {initial}
           </InitialBubble>
         )}
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: isSender ? 'flex-end' : 'flex-start' }}>
+        <div style={{ width: '100%', display: 'flex', justifyContent: isSender ? 'flex-end' : 'flex-start' }}>
           <MessageBubble isSender={isSender}>
-            {text}
+            {renderContent()}
           </MessageBubble>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <StatusText>{time}</StatusText>

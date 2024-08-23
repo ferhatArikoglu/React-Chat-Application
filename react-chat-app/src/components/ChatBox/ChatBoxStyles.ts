@@ -1,3 +1,4 @@
+import { io } from 'socket.io-client';
 import styled from 'styled-components';
 
 export const ChatBoxContainer = styled.div`
@@ -6,7 +7,7 @@ export const ChatBoxContainer = styled.div`
   height: calc(100vh - 100px);
   width: 100%;
   border: 1px solid #ccc;
-  padding: 10px;
+  padding: 0 0 20px 10px !important;
   overflow-y: auto;
   position: relative;
   background-color: #f5f5f5;

@@ -32,12 +32,31 @@ const ChatBox: React.FC<ChatBoxProps> = ({ username }) => {
     }
   };
 
+  const handleSendImageMessage = (count: number) => {
+    for (let i = 0; i < count; i++) {
+      const imageMessage = { 
+        id: Date.now().toString() + i, 
+        text: `<img src="https://picsum.photos/200/300?random=${Math.random()}" alt="Random Image" />`, 
+        sender: 'Server', 
+        status: "sent", 
+        time: new Date().toLocaleTimeString(), 
+        color: '#888' 
+      };
+      sendMessage(imageMessage);
+    }
+  };
+
   return (
     <>
       <Header username={username} />
       <ChatBoxContainer>
         <MessageList messages={messages} username={username} chatEndRef={chatEndRef} />
-        <ChatInput input={input} setInput={setInput} sendMessage={handleSendMessage} />
+        <ChatInput 
+          input={input} 
+          setInput={setInput} 
+          sendMessage={handleSendMessage} 
+          sendImageMessage={handleSendImageMessage} 
+        />
       </ChatBoxContainer>
     </>
   );

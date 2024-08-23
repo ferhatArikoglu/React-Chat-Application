@@ -6,12 +6,20 @@ interface ChatInputProps {
   input: string;
   setInput: (value: string) => void;
   sendMessage: () => void;
+  sendImageMessage: (count: number) => void; // Yeni fonksiyon
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ input, setInput, sendMessage }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ input, setInput, sendMessage, sendImageMessage }) => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
-      sendMessage();
+      if (input.startsWith('/image')) {
+        const parts = input.split(' ');
+        const count = parseInt(parts[1]) || 1; // Sayıyı al
+        sendImageMessage(count); // Görüntüleri gönder
+      } else {
+        sendMessage();
+      }
+      setInput(''); // Girdiği temizle
     }
   };
 
@@ -21,9 +29,18 @@ const ChatInput: React.FC<ChatInputProps> = ({ input, setInput, sendMessage }) =
         value={input} 
         onChange={(e) => setInput(e.target.value)} 
         placeholder="Mesaj..."
-        onKeyDown={handleKeyDown}  // Enter tuşu ile gönderme
+        onKeyDown={handleKeyDown}  
       />
-      <button onClick={sendMessage}>
+      <button onClick={() => {
+        if (input.startsWith('/image')) {
+          const parts = input.split(' ');
+          const count = parseInt(parts[1]) || 1;
+          sendImageMessage(count);
+        } else {
+          sendMessage();
+        }
+        setInput(''); 
+      }}>
         <FaPaperPlane size={20} />
       </button>
     </InputContainer>
