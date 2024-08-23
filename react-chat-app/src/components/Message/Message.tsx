@@ -1,24 +1,35 @@
 import React from 'react';
-import { MessageBubble, MessageContainer, StatusText } from '../ChatBox/ChatBoxStyles';
+import { InitialBubble, MessageBubble, MessageContainer, StatusText, MessageWrapper } from './MessageStyles';
 
 interface MessageProps {
   text: string;
-  sender: string;
   isSender: boolean;
-  status: string;
   time: string;
+  sender: string;
+  color: string;
 }
 
-const Message: React.FC<MessageProps> = ({ text, sender, isSender, status, time }) => {
+const Message: React.FC<MessageProps> = ({ text, isSender, time, sender, color }) => {
+  const initial = sender.charAt(0).toUpperCase();
+
   return (
-    <MessageContainer isSender={isSender}>
-      <MessageBubble isSender={isSender}>
-        <strong>{sender}: </strong> {text}
-        <div style={{ fontSize: '10px', marginTop: '5px' }}>
-          <StatusText status={status}>{status === "Görüldü" ? '✓✓' : '✓'} {time}</StatusText>
+    <MessageWrapper isSender={isSender}>
+      <MessageContainer isSender={isSender}>
+        {!isSender && (
+          <InitialBubble color={color}>
+            {initial}
+          </InitialBubble>
+        )}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: isSender ? 'flex-end' : 'flex-start' }}>
+          <MessageBubble isSender={isSender}>
+            {text}
+          </MessageBubble>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <StatusText>{time}</StatusText>
+          </div>
         </div>
-      </MessageBubble>
-    </MessageContainer>
+      </MessageContainer>
+    </MessageWrapper>
   );
 };
 

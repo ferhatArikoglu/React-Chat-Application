@@ -1,64 +1,33 @@
-import React, { useState, useEffect, useRef } from "react";
-import io from "socket.io-client";
-import { ChatBoxContainer, InputContainer } from "./ChatBoxStyles";
-import Message from "../Message/Message";
+import React, { useState, useEffect } from "react";
+import { ChatBoxContainer } from "./ChatBoxStyles";
+import MessageList from "./MessageList/MessageList";
+import ChatInput from "./ChatInput/ChatInput";
 import Header from "../Header/Header";
-
-const socket = io("http://localhost:3001");
+import { useChatSocket } from './useChatSocket/useChatSocket';
+import { getRandomColor } from "../Utils/utils";
 
 interface ChatBoxProps {
   username: string;
 }
 
 const ChatBox: React.FC<ChatBoxProps> = ({ username }) => {
-  const [messages, setMessages] = useState<{ id: string, text: string; sender: string; status: string; time: string }[]>([]);
   const [input, setInput] = useState('');
-  const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const [userColor, setUserColor] = useState<string>(getRandomColor());
   const room = "general";
+  
+  const { messages, chatEndRef, sendMessage } = useChatSocket(username, room);
 
-  useEffect(() => {
-    socket.emit("join_room", room);
-
-    socket.on("receive_message", (message: { id: string, text: string; sender: string; status: string; time: string }) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
-
-    socket.on("message_seen", (messageId: string) => {
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg.id === messageId ? { ...msg, status: "Görüldü" } : msg
-        )
-      );
-    });
-
-    return () => {
-      socket.off("receive_message");
-      socket.off("message_seen");
-    };
-  }, []);
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  // Focus durumu dinleme
-  useEffect(() => {
-    const handleFocus = () => {
-      messages.forEach((msg) => {
-        if (msg.status === "Gönderildi" && msg.sender !== username) {
-          socket.emit("message_seen", { messageId: msg.id, room });
-        }
-      });
-    };
-
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
-  }, [messages, username]);
-
-  const sendMessage = () => {
+  const handleSendMessage = () => {
     if (input.trim()) {
-      const message = { id: Date.now().toString(), text: input, sender: username, status: "Gönderildi", time: new Date().toLocaleTimeString() };
-      socket.emit("send_message", { message, room });
+      const message = { 
+        id: Date.now().toString(), 
+        text: input, 
+        sender: username, 
+        status: "sent", 
+        time: new Date().toLocaleTimeString(), 
+        color: userColor 
+      };
+      sendMessage(message);
       setInput('');
     }
   };
@@ -67,21 +36,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ username }) => {
     <>
       <Header username={username} />
       <ChatBoxContainer>
-        {messages.map((msg, index) => (
-          <Message 
-            key={index} 
-            text={msg.text} 
-            sender={msg.sender} 
-            isSender={msg.sender === username}
-            status={msg.status}
-            time={msg.time}
-          />
-        ))}
-        <div ref={chatEndRef} />
-        <InputContainer>
-          <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Mesajınızı yazın..." />
-          <button onClick={sendMessage}>Gönder</button>
-        </InputContainer>
+        <MessageList messages={messages} username={username} chatEndRef={chatEndRef} />
+        <ChatInput input={input} setInput={setInput} sendMessage={handleSendMessage} />
       </ChatBoxContainer>
     </>
   );

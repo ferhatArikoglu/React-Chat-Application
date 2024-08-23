@@ -31,11 +31,6 @@ io.on("connection", (socket) => {
     io.to(room).emit("receive_message", message);
   });
 
-  // Mesajın görüldüğünü bildirme
-  socket.on("message_seen", ({ messageId, room }) => {
-    io.to(room).emit("message_seen", messageId);
-  });
-
   socket.on("disconnect", () => {
     console.log("Kullanıcı ayrıldı:", socket.id);
   });

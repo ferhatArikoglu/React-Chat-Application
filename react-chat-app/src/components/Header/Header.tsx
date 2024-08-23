@@ -8,7 +8,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ username }) => {
   return (
     <HeaderContainer>
-      {username} ile Sohbet
+    React Chat App
     </HeaderContainer>
   );
 };
