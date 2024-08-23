@@ -46,6 +46,18 @@ const ChatBox: React.FC<ChatBoxProps> = ({ username }) => {
     }
   };
 
+  const handleSendSelectMessage = (selection: string) => {
+    const selectMessage = { 
+      id: Date.now().toString(), 
+      text: `Selected: ${selection}`, 
+      sender: 'Server', 
+      status: "sent", 
+      time: new Date().toLocaleTimeString(), 
+      color: '#888' 
+    };
+    sendMessage(selectMessage);
+  };
+
   return (
     <>
       <Header username={username} />
@@ -56,6 +68,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ username }) => {
           setInput={setInput} 
           sendMessage={handleSendMessage} 
           sendImageMessage={handleSendImageMessage} 
+          sendSelectMessage={handleSendSelectMessage} 
         />
       </ChatBoxContainer>
     </>
